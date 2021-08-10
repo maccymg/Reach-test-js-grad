@@ -38,6 +38,38 @@ The results should have this structure:
  * NOTE: the parent array and each "packageNames" array should 
  * be in alphabetical order.
  */
+const { default: axios } = require("axios");
+
+const getData = async () => {
+  try {
+    const response = await axios({
+      method: 'get',
+      url: 'https://api.npms.io/v2/search/suggestions?q=react',
+      return_payload: true,
+    })
+    const data = response.data
+    // console.log(data)
+    let answerArray = []
+    data.forEach(entryObject => {
+      // console.log(entryObject)
+      const packageName = entryObject.package.name
+      // console.log(packageName)
+      entryObject.package.maintainers.forEach(maintainer => {
+        // console.log(maintainer)
+        if (!answerArray[maintainer.username]) {
+          answerArray[maintainer.username] = []
+        }
+        answerArray[maintainer.username].push(packageName)
+      })
+    });
+    // console.log(answerArray)
+    return answerArray
+
+  } catch (err) {
+    console.log(err)
+  }
+}
+getData()
 
 module.exports = async function organiseMaintainers() {
   // TODO
